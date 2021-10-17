@@ -1,6 +1,7 @@
 import logging
 import sys
 from collections import namedtuple, defaultdict
+import json
 
 import requests
 
@@ -48,6 +49,25 @@ class MiniGame:
         self._check_group(group)
         # defensive copy
         return list(self._groups[group])
+
+
+class MiniGameJsonSerializer:
+    def __init__(self, game):
+        if not isinstance(game, MiniGame):
+            raise Exception("This class can only serialize MiniGame instances")
+        self.game = game
+
+    def serialize(self, file):
+        tmp = []
+        for group in MiniGame.GROUPS:
+            clues = self.game.clues(group)
+            for clue in clues:
+                tmp.append({
+                    "Group": group,
+                    "Number": clue.number,
+                    "String": clue.string
+                })
+        return json.dump(tmp, file)
 
 
 def main():
