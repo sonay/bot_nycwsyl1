@@ -1,5 +1,6 @@
 import logging
 import sys
+from collections import namedtuple, defaultdict
 
 import requests
 
@@ -14,6 +15,39 @@ def fetch_source():
     resp = requests.get(NYT_MINI_GAME_URL)
     resp.raise_for_status()
     return resp.text
+
+
+Clue = namedtuple('Clue', ['number', 'string'])
+
+
+class MiniGame:
+    GROUPS = ["Across", "Down"]
+
+    def __init__(self):
+        self._groups = defaultdict(list)
+
+    def _check_group(self, group):
+        if group not in self.GROUPS:
+            raise ValueError(f"Illegal group value: {group}")
+        return group
+
+    def add_clue(self, group, clue):
+        self._check_group(group)
+        self._groups[group].append(clue)
+
+    def add_clues(self, group, clues):
+        self._check_group(group)
+        self._groups[group].extend(clues)
+
+    def set_group(self, group, clues):
+        self._check_group(group)
+        # defensive copy
+        self._groups[group] = clues[:]
+
+    def clues(self, group):
+        self._check_group(group)
+        # defensive copy
+        return list(self._groups[group])
 
 
 def main():
