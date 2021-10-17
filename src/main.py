@@ -4,6 +4,7 @@ from collections import namedtuple, defaultdict
 import json
 import re
 import uuid
+import os
 
 import requests
 import bs4
@@ -186,6 +187,16 @@ def unique_name():
     return f"bot_nycwsyl1_{str(uuid.uuid4())}.json"
 
 
+def pretty_print(mini_game):
+    "Print game to stdout with a more human-readable form."
+    for group in mini_game.GROUPS:
+        out = sys.stdout
+        sep = os.linesep
+        out.write(f'=== {group} ==={sep}')
+        for clue in mini_game.clues(group):
+            out.write(f'{clue.number}. {clue.string}{sep}')
+
+
 def main():
     logging.basicConfig(filename='bot_nycwsyl1.log', format='%(asctime)s %(levelname)s %(message)s', level=logging.INFO)
     if sys.version_info[0:3] != (3,8,7):
@@ -208,6 +219,8 @@ def main():
     with open(unique_name(), 'w') as f:
         MiniGameJsonSerializer(game).serialize(f)
         logging.info(f"Serialized game to {f.name}")
+
+    pretty_print(game)
 
 
 if __name__ == "__main__":
