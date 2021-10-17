@@ -3,10 +3,10 @@ import sys
 from collections import namedtuple, defaultdict
 import json
 import re
+import uuid
 
 import requests
 import bs4
-
 
 _logger = logging.getLogger(__name__)
 
@@ -182,6 +182,10 @@ class ParserException(Exception):
         self.__init__(message)
 
 
+def unique_name():
+    return f"bot_nycwsyl1_{str(uuid.uuid4())}.json"
+
+
 def main():
     logging.basicConfig(filename='bot_nycwsyl1.log', format='%(asctime)s %(levelname)s %(message)s', level=logging.INFO)
     if sys.version_info[0:3] != (3,8,7):
@@ -200,6 +204,10 @@ def main():
     except ParserException as e:
         _logger.critical(f"Error while parsing page source:{e}")
         return
+
+    with open(unique_name(), 'w') as f:
+        MiniGameJsonSerializer(game).serialize(f)
+        logging.info(f"Serialized game to {f.name}")
 
 
 if __name__ == "__main__":
